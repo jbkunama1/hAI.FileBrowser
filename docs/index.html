@@ -4,28 +4,59 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hAI.FileBrowser</title>
+<meta name="description" content="Portainer-Stack für File Browser, betrieben im highfishNetwork.">
 <style>
-  :root{--bg:#f7f6f2;--surface:#fff;--text:#28251d;--muted:#7a7974;--accent:#01696f;--border:#dcd9d5}
-  @media (prefers-color-scheme: dark){:root{--bg:#171614;--surface:#1c1b19;--text:#cdccca;--muted:#797876;--accent:#4f98a3;--border:#262523}}
+  :root{
+    --bg:#f7f6f2;--surface:#ffffff;--surface-2:#fbfbf9;--border:#dcd9d5;
+    --text:#28251d;--muted:#7a7974;--accent:#01696f;--accent-hover:#0c4e54;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#171614;--surface:#1c1b19;--surface-2:#201f1d;--border:#393836;
+      --text:#cdccca;--muted:#797876;--accent:#4f98a3;--accent-hover:#227f8b;
+    }
+  }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:2rem 1rem}
-  main{max-width:720px;margin:0 auto}
-  h1{font-size:1.9rem;margin-bottom:.5rem}
-  p.lead{color:var(--muted);margin-bottom:1.5rem}
-  .badges img{margin:2px}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin:1.25rem 0}
+  body{
+    font-family:-apple-system,'Segoe UI',system-ui,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.6;
+    padding:2.5rem 1.25rem;
+  }
+  main{max-width:760px;margin:0 auto}
+  header{margin-bottom:1.5rem}
+  h1{font-size:clamp(1.6rem,4vw,2.1rem);margin-bottom:.4rem}
+  p.lead{color:var(--muted);margin-bottom:1.25rem;max-width:60ch}
+  .badges{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1.75rem}
+  .badges img{height:20px}
+  .card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:1.5rem;margin-bottom:1.25rem;
+  }
+  .card h2{font-size:1.1rem;margin-bottom:.9rem}
   table{width:100%;border-collapse:collapse;font-size:.95rem}
-  td,th{padding:.4rem .5rem;text-align:left;border-bottom:1px solid var(--border)}
-  a{color:var(--accent);text-decoration:none}
-  a:hover{text-decoration:underline}
-  code{background:var(--border);padding:.1rem .35rem;border-radius:4px;font-size:.9em}
-  footer{margin-top:2rem;color:var(--muted);font-size:.85rem}
+  td,th{padding:.5rem .4rem;text-align:left;border-bottom:1px solid var(--border)}
+  th{color:var(--muted);font-weight:600;width:38%}
+  tr:last-child td{border-bottom:none}
+  code{background:var(--surface-2);border:1px solid var(--border);padding:.15rem .4rem;border-radius:5px;font-size:.88em}
+  a{color:var(--accent);text-decoration:none;font-weight:500}
+  a:hover{color:var(--accent-hover);text-decoration:underline}
+  .links{display:flex;flex-direction:column;gap:.5rem}
+  .tag{
+    display:inline-flex;align-items:center;gap:.3rem;
+    background:var(--surface-2);border:1px solid var(--border);
+    border-radius:999px;padding:.2rem .65rem;font-size:.82rem;color:var(--muted);
+  }
+  .tag-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem}
+  footer{margin-top:2rem;color:var(--muted);font-size:.85rem;text-align:center}
 </style>
 </head>
 <body>
 <main>
-  <h1>hAI.FileBrowser</h1>
-  <p class="lead">Portainer-Stack für filebrowser (hurlenko/filebrowser-docker), betrieben im <code>highfishNetwork</code>.</p>
+  <header>
+    <h1>hAI.FileBrowser</h1>
+    <p class="lead">Portainer-Stack für <a href="https://github.com/hurlenko/filebrowser-docker" target="_blank" rel="noopener noreferrer">File Browser</a> — self-hosted Dateimanager im Docker-Container, eingebunden in <code>highfishNetwork</code>.</p>
+  </header>
 
   <div class="badges">
     <img src="https://img.shields.io/docker/pulls/hurlenko/filebrowser?logo=docker&color=0db7ed" alt="Docker Pulls">
@@ -33,25 +64,39 @@
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
     <img src="https://img.shields.io/badge/Portainer-Stack-13BEF9?logo=portainer&logoColor=white" alt="Portainer">
     <img src="https://img.shields.io/github/last-commit/jbkunama1/hAI.FileBrowser" alt="Last Commit">
+    <img src="https://img.shields.io/badge/Auth-enabled-success?logo=letsencrypt&logoColor=white" alt="Auth enabled">
   </div>
 
-  <div class="card">
+  <section class="card">
+    <h2>Deployment-Übersicht</h2>
     <table>
-      <tr><th>Eigenschaft</th><th>Wert</th></tr>
-      <tr><td>Image</td><td><code>hurlenko/filebrowser:latest</code></td></tr>
-      <tr><td>Netzwerk</td><td><code>highfishNetwork</code></td></tr>
-      <tr><td>Host</td><td>192.168.178.21</td></tr>
-      <tr><td>URL</td><td><a href="http://filebrowser.arbeitermili.eu" target="_blank" rel="noopener">filebrowser.arbeitermili.eu</a></td></tr>
+      <tr><th>Image</th><td><code>hurlenko/filebrowser:latest</code></td></tr>
+      <tr><th>Netzwerk</th><td><code>highfishNetwork</code> (external)</td></tr>
+      <tr><th>Host</th><td>192.168.178.21</td></tr>
+      <tr><th>Port</th><td><code>8888</code> (Host) &rarr; <code>8080</code> (Container)</td></tr>
+      <tr><th>URL</th><td><a href="http://filebrowser.arbeitermili.eu" target="_blank" rel="noopener noreferrer">filebrowser.arbeitermili.eu</a></td></tr>
+      <tr><th>Auth</th><td>aktiv via <code>FB_USERNAME</code> / <code>FB_PASSWORD</code></td></tr>
+      <tr><th>Deployment</th><td>Portainer Git-Stack (Pull &amp; Redeploy / Webhook)</td></tr>
     </table>
-  </div>
+    <div class="tag-row">
+      <span class="tag">Docker Compose</span>
+      <span class="tag">.env-basiert</span>
+      <span class="tag">Multi-Verzeichnis</span>
+      <span class="tag">GitOps-ready</span>
+    </div>
+  </section>
 
-  <div class="card">
-    <h2>Repository</h2>
-    <p><a href="https://github.com/jbkunama1/hAI.FileBrowser" target="_blank" rel="noopener">github.com/jbkunama1/hAI.FileBrowser</a></p>
-    <p><a href="https://github.com/hurlenko/filebrowser-docker" target="_blank" rel="noopener">Upstream: hurlenko/filebrowser-docker</a></p>
-  </div>
+  <section class="card">
+    <h2>Links</h2>
+    <div class="links">
+      <a href="https://github.com/jbkunama1/hAI.FileBrowser" target="_blank" rel="noopener noreferrer">→ Repository auf GitHub</a>
+      <a href="https://github.com/jbkunama1/hAI.FileBrowser/blob/main/README.md" target="_blank" rel="noopener noreferrer">→ Vollständige Setup-Anleitung (README)</a>
+      <a href="https://github.com/hurlenko/filebrowser-docker" target="_blank" rel="noopener noreferrer">→ Upstream Image: hurlenko/filebrowser-docker</a>
+      <a href="https://filebrowser.org/" target="_blank" rel="noopener noreferrer">→ File Browser Dokumentation</a>
+    </div>
+  </section>
 
-  <footer>Erstellt für Portainer Git-Stack Deployment &middot; Auto-Update via Pull/Webhook</footer>
+  <footer>hAI.FileBrowser &middot; MIT License &middot; betrieben von Daniel Lienhard</footer>
 </main>
 </body>
 </html>
