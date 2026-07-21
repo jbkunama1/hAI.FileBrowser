@@ -9,6 +9,10 @@ services:
     ports:
       - "8888:8080"
 
+    environment:
+      - FB_USERNAME=${FB_USERNAME}
+      - FB_PASSWORD=${FB_PASSWORD}
+
     volumes:
       - ${FB_CONFIG_PATH}:/config
       - ${FB_DATA_ALLGEMEIN}:/data/allgemein

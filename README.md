@@ -44,6 +44,44 @@ hAI.FileBrowser/
 - `/srv/filebrowser/data` → `/data`
 - `/srv/filebrowser/config` → `/config`
 
+## Authentifizierung
+
+File Browser startet standardmäßig mit dem Login `admin`/`admin` — dieses Passwort **muss** vor dem produktiven Einsatz geändert werden.
+
+### Eigenen Benutzer beim ersten Start setzen
+
+In der `.env` werden `FB_USERNAME` und `FB_PASSWORD` gesetzt:
+
+```env
+FB_USERNAME=daniel
+FB_PASSWORD=BITTE_SICHERES_PASSWORT_EINTRAGEN
+```
+
+Diese Werte werden über die Compose-Datei als Umgebungsvariablen an den Container übergeben:
+
+```yaml
+environment:
+  - FB_USERNAME=${FB_USERNAME}
+  - FB_PASSWORD=${FB_PASSWORD}
+```
+
+**Wichtig:** Diese Variablen wirken nur, solange noch keine `filebrowser.db` im `/config`-Volume existiert. Wurde der Container bereits einmal gestartet, hat sich die Datenbank bereits mit den Default-Werten initialisiert — in dem Fall entweder:
+
+- die Zugangsdaten direkt im Webinterface unter **Settings → Profile → Change Password** ändern, oder
+- die Datei `filebrowser.db` im gemounteten Config-Verzeichnis (`FB_CONFIG_PATH`) löschen und den Container neu starten, damit die `.env`-Werte greifen.
+
+### In Portainer eintragen
+
+Wie bei den Verzeichnis-Variablen gilt: Portainer liest die `.env` bei Git-Stacks nicht automatisch mit. Trage `FB_USERNAME` und `FB_PASSWORD` daher direkt im Stack unter **Environment variables** ein (Advanced mode zum Einfügen im `KEY=VALUE`-Format).
+
+### Zusätzliche Absicherung (optional)
+
+Für einen weiteren Schutz nach außen (z. B. wenn die Subdomain öffentlich erreichbar ist), empfiehlt sich zusätzlich Basic Auth oder eine Zugriffsbeschränkung auf Reverse-Proxy-Ebene (z. B. IP-Whitelist oder Auth-Middleware in Traefik/Nginx Proxy Manager), damit selbst bei kompromittierten Zugangsdaten eine zweite Hürde besteht.
+
+### Kein Login gewünscht (nur für vertrauenswürdige LAN-Umgebungen)
+
+File Browser unterstützt auch einen Modus ganz ohne Login über `FB_NOAUTH=true`. Das wird **nicht empfohlen**, sobald die Instanz über eine öffentlich erreichbare Domain wie `filebrowser.arbeitermili.eu` läuft, da dann jeder mit Netzwerkzugriff auf deine Dateien zugreifen könnte.
+
 ## Update-Workflow
 
 ```bash
