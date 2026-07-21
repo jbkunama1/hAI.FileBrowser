@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  filebrowser:
+    image: hurlenko/filebrowser:latest
+    container_name: filebrowser
+    restart: unless-stopped
+
+    ports:
+      - "8888:8080"
+
+    volumes:
+      - ${FB_CONFIG_PATH}:/config
+      - ${FB_DATA_ALLGEMEIN}:/data/allgemein
+      - ${FB_DATA_DOKUMENTE}:/data/dokumente
+      - ${FB_DATA_FOTOS}:/data/fotos
+      - ${FB_DATA_PROJEKTE}:/data/projekte
+
+    networks:
+      - highfishNetwork
+
+    # user: "${FB_UID}:${FB_GID}"
+
+networks:
+  highfishNetwork:
+    external: true

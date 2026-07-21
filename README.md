@@ -16,6 +16,7 @@ Portainer-Stack für [hurlenko/filebrowser-docker](https://github.com/hurlenko/f
 | Image | `hurlenko/filebrowser:latest` |
 | Netzwerk | `highfishNetwork` (external) |
 | Host | `192.168.178.21` |
+| Port | `8888` (Host) → `8080` (Container) |
 | URL | [filebrowser.arbeitermili.eu](http://filebrowser.arbeitermili.eu) |
 | Deployment | Portainer Git-Stack (Auto-Update via Pull/Webhook) |
 
@@ -23,9 +24,8 @@ Portainer-Stack für [hurlenko/filebrowser-docker](https://github.com/hurlenko/f
 
 ```text
 hAI.FileBrowser/
-├── stacks/
-│   └── filebrowser/
-│       └── docker-compose.yml
+├── docker-compose.yml
+├── .env.example
 ├── docs/
 │   └── index.html        # GitHub Pages Übersicht
 └── README.md
@@ -36,7 +36,7 @@ hAI.FileBrowser/
 1. Portainer → **Stacks** → **Add Stack** → **Repository**
 2. Repository URL: `https://github.com/<dein-user>/hAI.FileBrowser`
 3. Reference: `refs/heads/main`
-4. Compose path: `stacks/filebrowser/docker-compose.yml`
+4. Compose path: `docker-compose.yml`
 5. Optional: **GitOps updates** aktivieren (Polling oder Webhook), damit Änderungen aus dem Repo automatisch übernommen werden.
 
 ## Volumes
@@ -48,7 +48,7 @@ hAI.FileBrowser/
 
 ```bash
 git pull
-# Änderungen in stacks/filebrowser/docker-compose.yml vornehmen
+# Änderungen in docker-compose.yml vornehmen
 git commit -am "update stack"
 git push
 ```
@@ -58,3 +58,57 @@ Portainer zieht die Änderung beim nächsten Poll-Intervall oder per Webhook-Tri
 ## Lizenz
 
 Dieses Repository steht unter der [MIT-Lizenz](LICENSE). Das zugrunde liegende Image [hurlenko/filebrowser-docker](https://github.com/hurlenko/filebrowser-docker) unterliegt dessen eigener Lizenz.
+
+
+## Mehrere Verzeichnisse einbinden (per .env)
+
+Die Verzeichnispfade werden nicht mehr hart in der `docker-compose.yml` hinterlegt, sondern über Umgebungsvariablen aus einer `.env`-Datei im selben Ordner (`.env`) eingelesen.
+
+### 1. .env anlegen
+
+Kopiere `.env.example` zu `.env` und trage deine echten Pfade ein:
+
+```env
+FB_CONFIG_PATH=/srv/filebrowser/config
+
+FB_DATA_ALLGEMEIN=/srv/filebrowser/data
+FB_DATA_DOKUMENTE=/mnt/nas/dokumente
+FB_DATA_FOTOS=/mnt/nas/fotos
+FB_DATA_PROJEKTE=/home/daniel/projekte
+
+# FB_UID=1000
+# FB_GID=1000
+```
+
+### 2. docker-compose.yml referenziert die Variablen
+
+```yaml
+volumes:
+  - ${FB_CONFIG_PATH}:/config
+  - ${FB_DATA_ALLGEMEIN}:/data/allgemein
+  - ${FB_DATA_DOKUMENTE}:/data/dokumente
+  - ${FB_DATA_FOTOS}:/data/fotos
+  - ${FB_DATA_PROJEKTE}:/data/projekte
+```
+
+### 3. Wichtiger Hinweis für Portainer Git-Stacks
+
+Portainer liest `.env`-Dateien bei Git-basierten Stacks **nicht automatisch aus dem Repository** — aus Sicherheitsgründen wird die `.env` nicht mitgeklont, falls sie ins Repo gepusht würde (sie sollte ohnehin nie ins Repo, siehe `.gitignore`). Trage die Variablen daher direkt in Portainer ein:
+
+1. Beim Stack-Deployment (oder später unter **Editor**) den Abschnitt **Environment variables** öffnen.
+2. Entweder einzeln per **Add environment variable** eintragen, oder über **Advanced mode** den Inhalt deiner `.env`-Datei im `KEY=VALUE`-Format einfügen.
+3. Stack deployen bzw. **Update the stack** klicken.
+
+### 4. Neue Verzeichnisse ergänzen
+
+Um ein weiteres Verzeichnis hinzuzufügen, in der `docker-compose.yml` eine neue Zeile ergänzen:
+
+```yaml
+- ${FB_DATA_BACKUP}:/data/backup
+```
+
+und in Portainer die passende Umgebungsvariable `FB_DATA_BACKUP=/mnt/backup` hinzufügen. Für read-only-Freigaben `:ro` anhängen, z. B. `- ${FB_DATA_BACKUP}:/data/backup:ro`.
+
+### 5. Rechteprobleme
+
+Falls File Browser keinen Zugriff auf bestimmte Ordner hat, `user: "${FB_UID}:${FB_GID}"` in der Compose-Datei aktivieren und `FB_UID`/`FB_GID` mit `id daniel` auf dem Host ermitteln.
